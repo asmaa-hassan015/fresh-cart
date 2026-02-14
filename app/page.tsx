@@ -1,15 +1,10 @@
-'use client'
+
 
 import Link from "next/link";
 import { getProducts, getCategories } from "./lib/api";
 import ProductCard from "./components/ProductCard";
 import CategoryCard from "./components/CategoryCard";
-import dynamic from 'next/dynamic';
-
-const HeroSlider = dynamic(() => import('./components/HeroSlider'), { 
-  ssr: false,
-  loading: () => <div className="h-[500px] md:h-[600px] bg-neutral-900 animate-pulse" /> 
-});
+import HeroSlider from "./components/HeroSlider";
 
 const FEATURE_BADGES = [
   {
