@@ -2,13 +2,32 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useWishlist } from "../context/WishlistContext";
-import { useCart } from "../context/CartContext";
+import { useWishlist } from "@/app/context/WishlistContext";
+import { useCart } from "@/app/context/CartContext";
 import { Trash2, ShoppingCart } from "lucide-react";
 
 export default function WishlistPage() {
-    const { wishlistItems, removeFromWishlist } = useWishlist();
+    const { wishlistItems, removeFromWishlist, isLoading } = useWishlist();
     const { addToCart } = useCart();
+
+    if (isLoading) {
+        return (
+            <div className="bg-[var(--bg-light)] min-h-screen">
+                <div className="bg-white border-b border-[var(--border)] mb-8">
+                    <div className="max-w-7xl mx-auto px-4 py-8 md:py-10">
+                        <div className="h-8 w-48 bg-gray-200 rounded-lg animate-pulse"></div>
+                    </div>
+                </div>
+                <div className="max-w-7xl mx-auto px-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {[1, 2, 4, 4].map((i) => (
+                            <div key={i} className="bg-white rounded-2xl h-80 animate-pulse"></div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     if (!wishlistItems || wishlistItems.length === 0) {
         return (

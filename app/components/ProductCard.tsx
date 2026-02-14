@@ -4,8 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import StarRating from "./StarRating";
 import type { Product } from "@/app/lib/api";
-import { useCart } from "../context/CartContext";
-import { useWishlist } from "../context/WishlistContext";
+import { useCart } from "@/app/context/CartContext";
+import { useWishlist } from "@/app/context/WishlistContext";
 import { Heart } from "lucide-react";
 
 export default function ProductCard({ product }: { product: Product }) {

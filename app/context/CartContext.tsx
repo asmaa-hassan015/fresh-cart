@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import axios from 'axios';
-import { useAuth } from './AuthContext';
+import { useAuth } from '@/app/context/AuthContext';
 import toast from 'react-hot-toast';
 
 interface CartItem {

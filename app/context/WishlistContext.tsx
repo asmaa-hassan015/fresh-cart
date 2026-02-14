@@ -2,11 +2,12 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import axios from 'axios';
-import { useAuth } from './AuthContext';
+import { useAuth } from '@/app/context/AuthContext';
 import toast from 'react-hot-toast';
 
 interface WishlistContextType {
     wishlistItems: any[];
+    isLoading: boolean;
     addToWishlist: (productId: string) => Promise<void>;
     removeFromWishlist: (productId: string) => Promise<void>;
     isInWishlist: (productId: string) => boolean;
@@ -17,25 +18,30 @@ const WishlistContext = createContext<WishlistContextType | null>(null);
 export const WishlistProvider = ({ children }: { children: ReactNode }) => {
     const { token } = useAuth();
     const [wishlistItems, setWishlistItems] = useState<any[]>([]);
-
-    const headers = {
-        token: token || '',
-    };
+    const [isLoading, setIsLoading] = useState(true);
 
     const getWishlist = async () => {
         if (!token) {
             setWishlistItems([]);
+            setIsLoading(false);
             return;
         }
 
         try {
-            const { data } = await axios.get('https://ecommerce.routemisr.com/api/v1/wishlist', { headers });
+            setIsLoading(true);
+            const { data } = await axios.get('https://ecommerce.routemisr.com/api/v1/wishlist', {
+                headers: { token }
+            });
             if (data.status === 'success') {
                 setWishlistItems(data.data);
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            setWishlistItems([]);
+            if (error.response?.status === 404 || error.response?.status === 500) {
+                setWishlistItems([]);
+            }
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -49,10 +55,11 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
             return;
         }
         try {
-            const { data } = await axios.post('https://ecommerce.routemisr.com/api/v1/wishlist', { productId }, { headers });
+            const { data } = await axios.post('https://ecommerce.routemisr.com/api/v1/wishlist', { productId }, {
+                headers: { token }
+            });
             if (data.status === 'success') {
                 toast.success(data.message);
-                // Refresh list
                 getWishlist();
             }
         } catch (error: any) {
@@ -62,11 +69,13 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const removeFromWishlist = async (productId: string) => {
+        if (!token) return;
         try {
-            const { data } = await axios.delete(`https://ecommerce.routemisr.com/api/v1/wishlist/${productId}`, { headers });
+            const { data } = await axios.delete(`https://ecommerce.routemisr.com/api/v1/wishlist/${productId}`, {
+                headers: { token }
+            });
             if (data.status === 'success') {
                 toast.success('Removed from wishlist');
-                // Refresh list
                 getWishlist();
             }
         } catch (error) {
@@ -80,7 +89,7 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
     };
 
     return (
-        <WishlistContext.Provider value={{ wishlistItems, addToWishlist, removeFromWishlist, isInWishlist }}>
+        <WishlistContext.Provider value={{ wishlistItems, isLoading, addToWishlist, removeFromWishlist, isInWishlist }}>
             {children}
         </WishlistContext.Provider>
     );

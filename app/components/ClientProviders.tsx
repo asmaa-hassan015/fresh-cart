@@ -1,8 +1,8 @@
 'use client'
 
-import { AuthProvider } from '../context/AuthContext';
-import { CartProvider } from '../context/CartContext';
-import { WishlistProvider } from '../context/WishlistContext';
+import { AuthProvider } from '@/app/context/AuthContext';
+import { CartProvider } from '@/app/context/CartContext';
+import { WishlistProvider } from '@/app/context/WishlistContext';
 import { Toaster } from 'react-hot-toast';
 
 export default function ClientProviders({ children }: { children: React.ReactNode }) {
