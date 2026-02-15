@@ -63,9 +63,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem('freshCartToken', token);
     localStorage.setItem('freshCartUser', JSON.stringify(user));
     
-    // Save token to cookie with 7 days expiry
+    // Save token to cookie with 90 days expiry (to match JWT expiry)
     Cookies.set('freshCartToken', token, {
-      expires: 7,
+      expires: 90,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
     });
@@ -128,18 +128,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     router.push('/login');
   };
 
-  // Function to refresh user data (useful after profile updates)
+  // Function to refresh user data
   const refreshUser = async () => {
     try {
       if (!token) return;
       
-      // Assuming there's a /auth/me endpoint to get current user
-      // Adjust this based on your actual API
-      const { data } = await apiClient.get('/auth/me');
-      
-      if (data.user) {
-        setUser(data.user);
-        localStorage.setItem('freshCartUser', JSON.stringify(data.user));
+      // The API doesn't have a /users/me endpoint, so we'll keep the user data from login
+      // If you update the profile, the updated data will be returned from the updateMe endpoint
+      const storedUser = localStorage.getItem('freshCartUser');
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
       }
     } catch (error) {
       console.error('Failed to refresh user:', error);

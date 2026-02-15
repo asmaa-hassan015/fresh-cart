@@ -416,16 +416,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Bottom Feature Bar */}
-      <section className="border-t border-gray-100 bg-white">
-        <div className="mx-auto max-w-7xl px-4 py-6">
-          <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
-            {FEATURE_BADGES.map((feature) => (
-              <FeatureBadgeSmall key={`bottom-${feature.title}`} feature={feature} />
-            ))}
-          </div>
-        </div>
-      </section>
+     
     </div>
   );
 }

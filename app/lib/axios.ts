@@ -31,6 +31,7 @@ apiClient.interceptors.request.use(
 // Response interceptor - Handle errors globally
 apiClient.interceptors.response.use(
   (response) => {
+    console.log(response.data)
     return response;
   },
   (error: AxiosError<any>) => {
@@ -41,13 +42,13 @@ apiClient.interceptors.response.use(
 
       switch (status) {
         case 401:
-          // Unauthorized - Clear auth data and redirect to login
+          // Unauthorized - Clear auth data and redirect to login   
           localStorage.removeItem('freshCartToken');
           localStorage.removeItem('freshCartUser');
           if (typeof window !== 'undefined') {
             window.location.href = '/login';
           }
-          toast.error('Session expired. Please login again.');
+          toast.error('Credentials Invalid');
           break;
 
         case 403:
@@ -88,6 +89,8 @@ apiClient.interceptors.response.use(
     }
 
     return Promise.reject(error);
+
+
   }
 );
 

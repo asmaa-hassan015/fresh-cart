@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "@/app/context/AuthContext";
+import UserDropdown from '@/app/components/userDropDownMenu';
 import {
     Phone,
     Mail,
@@ -36,7 +37,7 @@ const categoryDropdownLinks = [
 ];
 
 export default function Navbar() {
-    const { user, logout } = useAuth();
+    const { user, isAuthenticated, isLoading } = useAuth();
     const pathname = usePathname();
     const [mobileOpen, setMobileOpen] = useState(false);
     const [catOpen, setCatOpen] = useState(false);
@@ -47,9 +48,8 @@ export default function Navbar() {
             <div className="hidden lg:block text-sm border-b border-gray-100">
                 <div className="container mx-auto px-4">
                     <div className="flex justify-between items-center h-10">
-
+                        {/* Left Side - Promo Messages */}
                         <div className="flex items-center gap-6 text-gray-500">
-
                             <a href="#" className="flex items-center gap-1.5 hover:text-primary-400 transition">
                                 <Van className="w-4 h-4 text-green-500" />
                                 <span>Free Shipping on Orders 500 EGP</span>
@@ -59,8 +59,10 @@ export default function Navbar() {
                                 <span>New Arrivals Daily</span>
                             </a>
                         </div>
+
+                        {/* Right Side - Contact & Auth */}
                         <div className="flex items-center gap-6">
-                            <div className='flex items-center gap-6 '>
+                            <div className='flex items-center gap-6'>
                                 <a className="flex items-center gap-1.5 hover:text-primary-400 transition" href="tel:+18001234567">
                                     <Phone className="w-3.5 h-3.5" />
                                     +1 (800) 123-4567
@@ -70,24 +72,24 @@ export default function Navbar() {
                                     support@freshcart.com
                                 </a>
                             </div>
+                            
                             <span className='w-px h-4 bg-gray-200'>|</span>
+                            
+                            {/* Top Bar Auth Section */}
                             <div className="flex items-center gap-4">
-                                {user ? (
-                                    <>
-                                        <span className="text-gray-600 font-medium">Hi, {user.name}</span>
-                                        <button onClick={logout} className="text-sm text-red-500 hover:text-red-700 font-semibold transition-colors">
-                                            Logout
-                                        </button>
-                                    </>
+                                {isLoading ? (
+                                    <div className="w-20 h-4 bg-gray-200 animate-pulse rounded"></div>
+                                ) : isAuthenticated ? (
+                                    <span className="text-gray-600 font-medium">Hi, {user?.name}</span>
                                 ) : (
                                     <>
                                         <Link href="/login" className="flex items-center gap-1.5 text-gray-600 hover:text-primary-600 transition-colors">
-                                            <User className="text-gray-600" />
+                                            <User className="w-4 h-4" />
                                             <span>Sign In</span>
                                         </Link>
 
                                         <Link href="/register" className="flex items-center gap-1.5 text-gray-600 hover:text-primary-600 transition-colors">
-                                            <UserPlus className="text-gray-600" />
+                                            <UserPlus className="w-4 h-4" />
                                             <span>Sign Up</span>
                                         </Link>
                                     </>
@@ -95,11 +97,10 @@ export default function Navbar() {
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
 
-            {/* Navbar */}
+            {/* Main Navbar */}
             <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur border-b border-neutral-200">
                 <div className="w-auto mx-auto px-4 h-[72px] flex items-center justify-between gap-6">
 
@@ -167,37 +168,42 @@ export default function Navbar() {
                         ))}
                     </div>
 
-                    {/* Icons */}
+                    {/* Right Side Icons & User Menu */}
                     <div className="flex items-center gap-2">
-                        {[Heart, ShoppingCart].map((Icon, i) => (
-                            <Link
-                                key={i}
-                                href={i === 0 ? "/wishlist" : "/cart"}
-                                className="p-2 rounded-xl text-neutral-600 hover:bg-primary-50 hover:text-primary-600 transition"
-                            >
-                                <Icon className="w-5 h-5" />
-                            </Link>
-                        ))}
+                        {/* Wishlist */}
+                        <Link
+                            href="/wishlist"
+                            className="p-2 rounded-xl text-neutral-600 hover:bg-primary-50 hover:text-primary-600 transition"
+                        >
+                            <Heart className="w-5 h-5" />
+                        </Link>
 
-                        {!user && (
-                            <Link
-                                href="/login"
-                                className="hidden md:flex items-center gap-2 px-4 py-2 rounded-xl bg-primary-500 text-white text-sm font-bold hover:bg-primary-600 transition"
-                            >
-                                <User className="w-4 h-4" />
-                                Sign In
-                            </Link>
-                        )}
+                        {/* Shopping Cart */}
+                        <Link
+                            href="/cart"
+                            className="p-2 rounded-xl text-neutral-600 hover:bg-primary-50 hover:text-primary-600 transition"
+                        >
+                            <ShoppingCart className="w-5 h-5" />
+                        </Link>
 
-                        {user && (
-                            <button
-                                onClick={logout}
-                                className="hidden md:flex items-center gap-2 px-4 py-2 rounded-xl bg-red-50 text-red-600 text-sm font-bold hover:bg-red-100 transition"
-                            >
-                                Logout
-                            </button>
-                        )}
+                        {/* User Menu or Login Button - Desktop */}
+                        <div className="hidden md:block">
+                            {isLoading ? (
+                                <div className="w-10 h-10 rounded-full bg-gray-200 animate-pulse"></div>
+                            ) : isAuthenticated ? (
+                                <UserDropdown />
+                            ) : (
+                                <Link
+                                    href="/login"
+                                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary-500 text-white text-sm font-bold hover:bg-primary-600 transition"
+                                >
+                                    <User className="w-4 h-4" />
+                                    Sign In
+                                </Link>
+                            )}
+                        </div>
 
+                        {/* Mobile Menu Toggle */}
                         <button
                             onClick={() => setMobileOpen(!mobileOpen)}
                             className="md:hidden p-2 rounded-xl hover:bg-neutral-100"
@@ -210,6 +216,7 @@ export default function Navbar() {
                 {/* Mobile Menu */}
                 {mobileOpen && (
                     <div className="md:hidden border-t bg-white px-4 py-6 space-y-3">
+                        {/* Mobile Navigation Links */}
                         {navLinks.map(link => (
                             <Link
                                 key={link.href}
@@ -220,6 +227,67 @@ export default function Navbar() {
                                 {link.label}
                             </Link>
                         ))}
+
+                        {/* Mobile Auth Section */}
+                        <div className="pt-4 border-t border-gray-200">
+                            {isLoading ? (
+                                <div className="px-4 py-3">
+                                    <div className="w-full h-10 bg-gray-200 animate-pulse rounded-xl"></div>
+                                </div>
+                            ) : isAuthenticated ? (
+                                <div className="px-4 py-3">
+                                    <div className="flex items-center gap-3 mb-3">
+                                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-emerald-600 text-white font-semibold flex items-center justify-center">
+                                            {user?.name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'}
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-semibold text-gray-800">{user?.name}</p>
+                                            <p className="text-xs text-gray-500">{user?.email}</p>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Link
+                                            href="/profile"
+                                            onClick={() => setMobileOpen(false)}
+                                            className="block px-4 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-100"
+                                        >
+                                            My Profile
+                                        </Link>
+                                        <Link
+                                            href="/orders"
+                                            onClick={() => setMobileOpen(false)}
+                                            className="block px-4 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-100"
+                                        >
+                                            My Orders
+                                        </Link>
+                                        <Link
+                                            href="/wishlist"
+                                            onClick={() => setMobileOpen(false)}
+                                            className="block px-4 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-100"
+                                        >
+                                            My Wishlist
+                                        </Link>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="space-y-2">
+                                    <Link
+                                        href="/login"
+                                        onClick={() => setMobileOpen(false)}
+                                        className="block px-4 py-3 rounded-xl text-center bg-primary-500 text-white text-sm font-bold hover:bg-primary-600 transition"
+                                    >
+                                        Sign In
+                                    </Link>
+                                    <Link
+                                        href="/register"
+                                        onClick={() => setMobileOpen(false)}
+                                        className="block px-4 py-3 rounded-xl text-center border-2 border-primary-500 text-primary-600 text-sm font-bold hover:bg-primary-50 transition"
+                                    >
+                                        Sign Up
+                                    </Link>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 )}
             </nav>

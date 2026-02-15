@@ -10,6 +10,8 @@ export const metadata = {
 export default async function CategoriesPage() {
   const categories = await getCategories();
 
+  
+
   return (
     <main className="min-h-screen bg-gray-50/50">
       {/* Header */}
@@ -71,6 +73,8 @@ export default async function CategoriesPage() {
           ))}
         </div>
       </section>
+
+      
     </main>
   );
 }

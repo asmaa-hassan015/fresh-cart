@@ -6,8 +6,6 @@ const protectedRoutes = [
   '/profile',
   '/orders',
   '/checkout',
-  '/wishlist',
-  '/cart',
 ];
 
 // Define auth routes that should redirect to home if already logged in
