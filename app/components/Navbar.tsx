@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "@/app/context/AuthContext";
+import { useCart } from "@/app/context/CartContext";
 import UserDropdown from '@/app/components/userDropDownMenu';
 import {
     Phone,
@@ -38,6 +39,7 @@ const categoryDropdownLinks = [
 
 export default function Navbar() {
     const { user, isAuthenticated, isLoading } = useAuth();
+    const { cartCount } = useCart();
     const pathname = usePathname();
     const [mobileOpen, setMobileOpen] = useState(false);
     const [catOpen, setCatOpen] = useState(false);
@@ -173,17 +175,22 @@ export default function Navbar() {
                         {/* Wishlist */}
                         <Link
                             href="/wishlist"
-                            className="p-2 rounded-xl text-neutral-600 hover:bg-primary-50 hover:text-primary-600 transition"
+                            className="p-2 rounded-xl text-neutral-600 hover:bg-primary-50 hover:text-primary-600 transition relative"
                         >
                             <Heart className="w-5 h-5" />
                         </Link>
 
-                        {/* Shopping Cart */}
+                        {/* Shopping Cart with Badge */}
                         <Link
                             href="/cart"
-                            className="p-2 rounded-xl text-neutral-600 hover:bg-primary-50 hover:text-primary-600 transition"
+                            className="p-2 rounded-xl text-neutral-600 hover:bg-primary-50 hover:text-primary-600 transition relative"
                         >
                             <ShoppingCart className="w-5 h-5" />
+                            {cartCount > 0 && (
+                                <span className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                                    {cartCount > 9 ? '9+' : cartCount}
+                                </span>
+                            )}
                         </Link>
 
                         {/* User Menu or Login Button - Desktop */}

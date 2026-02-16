@@ -7,7 +7,7 @@ import { Trash2, Plus, Minus, ArrowRight } from "lucide-react"
 import CartSkeleton from "../components/CartSkeleton";
 
 export default function CartPage() {
-    const { cartItems, numOfCartItems, cartDetails, updateCount, removeFromCart, clearCart, isLoading } = useCart();
+    const { cartItems, cartCount, cartData, updateCartItemCount, removeFromCart, clearCart, isLoading } = useCart();
 
     if (isLoading) {
         return <CartSkeleton />;
@@ -48,7 +48,7 @@ export default function CartPage() {
                 <div className="max-w-7xl mx-auto px-4 py-8 md:py-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h1 className="text-3xl font-bold text-[var(--text-dark)]">Shopping Cart</h1>
-                        <p className="text-[var(--text-gray)] mt-1">{numOfCartItems} items in your cart</p>
+                        <p className="text-[var(--text-gray)] mt-1">{cartCount} items in your cart</p>
                     </div>
                     <button
                         onClick={() => clearCart()}
@@ -86,7 +86,7 @@ export default function CartPage() {
                                         {/* Quantity Controls */}
                                         <div className="flex items-center border border-[var(--border)] rounded-lg overflow-hidden bg-[var(--bg-light)]">
                                             <button
-                                                onClick={() => updateCount(item.product._id, item.count - 1)}
+                                                onClick={() => updateCartItemCount(item.product._id, item.count - 1)}
                                                 disabled={item.count <= 1}
                                                 className="w-9 h-9 flex items-center justify-center hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                                             >
@@ -94,7 +94,7 @@ export default function CartPage() {
                                             </button>
                                             <span className="w-10 text-center font-semibold text-sm">{item.count}</span>
                                             <button
-                                                onClick={() => updateCount(item.product._id, item.count + 1)}
+                                                onClick={() => updateCartItemCount(item.product._id, item.count + 1)}
                                                 className="w-9 h-9 flex items-center justify-center hover:bg-gray-200 transition-colors"
                                             >
                                                 <Plus className="w-3.5 h-3.5" />
@@ -133,7 +133,7 @@ export default function CartPage() {
                             <div className="space-y-4 mb-6">
                                 <div className="flex justify-between items-center text-[var(--text-gray)]">
                                     <span>Subtotal</span>
-                                    <span>{cartDetails?.totalCartPrice || 0} EGP</span>
+                                    <span>{cartData?.totalCartPrice || 0} EGP</span>
                                 </div>
                                 <div className="flex justify-between items-center text-[var(--text-gray)]">
                                     <span>Shipping Estimate</span>
@@ -148,7 +148,7 @@ export default function CartPage() {
                             <div className="border-t border-[var(--border)] pt-4 mb-8">
                                 <div className="flex justify-between items-center mb-1">
                                     <span className="text-lg font-bold text-[var(--text-dark)]">Order Total</span>
-                                    <span className="text-2xl font-bold text-[var(--text-dark)]">{cartDetails?.totalCartPrice || 0} EGP</span>
+                                    <span className="text-2xl font-bold text-[var(--text-dark)]">{cartData?.totalCartPrice || 0} EGP</span>
                                 </div>
                             </div>
 
