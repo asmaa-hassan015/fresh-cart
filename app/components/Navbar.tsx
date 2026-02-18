@@ -1,7 +1,7 @@
 'use client'
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 import { useCart } from "@/app/context/CartContext";
@@ -20,14 +20,22 @@ import {
     Van,
     Gift,
     UserPlus,
-    Headset
+    Headset,
+    Home,
+    Store,
+    Grid3x3,
+    Award,
+    LogOut,
+    ChevronRight,
+    Package,
+    Settings
 } from "lucide-react";
 
 const navLinks = [
-    { href: "/", label: "Home" },
-    { href: "/products", label: "Shop" },
-    { href: "/categories", label: "Categories", hasDropdown: true },
-    { href: "/brands", label: "Brands" },
+    { href: "/", label: "Home", icon: Home },
+    { href: "/products", label: "Shop", icon: Store },
+    { href: "/categories", label: "Categories", icon: Grid3x3, hasDropdown: true },
+    { href: "/brands", label: "Brands", icon: Award },
 ];
 
 const categoryDropdownLinks = [
@@ -39,12 +47,24 @@ const categoryDropdownLinks = [
 ];
 
 export default function Navbar() {
-    const { user, isAuthenticated, isLoading } = useAuth();
+    const { user, isAuthenticated, isLoading, logout } = useAuth();
     const { cartCount } = useCart();
     const { wishlistCount } = useWishlist();
     const pathname = usePathname();
+    const router = useRouter();
     const [mobileOpen, setMobileOpen] = useState(false);
     const [catOpen, setCatOpen] = useState(false);
+    const [mobileCatExpanded, setMobileCatExpanded] = useState(false);
+
+    const handleLogout = () => {
+        logout();
+        setMobileOpen(false);
+    };
+
+    const closeMobileMenu = () => {
+        setMobileOpen(false);
+        setMobileCatExpanded(false);
+    };
 
     return (
         <>
@@ -220,96 +240,219 @@ export default function Navbar() {
                         {/* Mobile Menu Toggle */}
                         <button
                             onClick={() => setMobileOpen(!mobileOpen)}
-                            className="md:hidden p-2 rounded-xl hover:bg-neutral-100"
+                            className="md:hidden p-2 rounded-xl hover:bg-neutral-100 transition-colors"
                         >
-                            {mobileOpen ? <X /> : <Menu />}
+                            <Menu className="w-6 h-6" />
                         </button>
                     </div>
                 </div>
+            </nav>
 
-                {/* Mobile Menu */}
-                {mobileOpen && (
-                    <div className="md:hidden border-t bg-white px-4 py-6 space-y-3">
-                        {/* Mobile Navigation Links */}
-                        {navLinks.map(link => (
+            {/* Mobile Sidebar Overlay */}
+            {mobileOpen && (
+                <div 
+                    className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] md:hidden transition-opacity duration-300"
+                    onClick={closeMobileMenu}
+                ></div>
+            )}
+
+            {/* Mobile Sidebar */}
+            <div className={`fixed top-0 left-0 h-full w-80 bg-white z-[70] md:hidden transform transition-transform duration-300 ease-out ${
+                mobileOpen ? 'translate-x-0' : '-translate-x-full'
+            } shadow-2xl overflow-y-auto`}>
+                
+                {/* Sidebar Header */}
+                <div className="sticky top-0 bg-gradient-to-r from-green-500 to-emerald-600 px-6 py-5 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <img src="/logo.svg" alt="FreshCart" className="h-8" />
+                    </div>
+                    <button
+                        onClick={closeMobileMenu}
+                        className="p-2 rounded-lg bg-white/20 hover:bg-white/30 transition-colors"
+                    >
+                        <X className="w-5 h-5 text-white" />
+                    </button>
+                </div>
+
+                {/* User Section */}
+                <div className="px-6 py-6 border-b border-gray-200">
+                    {isLoading ? (
+                        <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 bg-gray-200 rounded-full animate-pulse"></div>
+                            <div className="flex-1">
+                                <div className="h-4 bg-gray-200 rounded w-24 mb-2 animate-pulse"></div>
+                                <div className="h-3 bg-gray-200 rounded w-32 animate-pulse"></div>
+                            </div>
+                        </div>
+                    ) : isAuthenticated ? (
+                        <div>
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 text-white font-bold text-lg flex items-center justify-center shadow-lg">
+                                    {user?.name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-bold text-gray-900 truncate">{user?.name}</p>
+                                    <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                                </div>
+                            </div>
+                            
+                            {/* Quick Stats */}
+                            <div className="grid grid-cols-2 gap-2">
+                                <Link 
+                                    href="/cart" 
+                                    onClick={closeMobileMenu}
+                                    className="flex items-center gap-2 p-2 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
+                                >
+                                    <ShoppingCart className="w-4 h-4 text-green-600" />
+                                    <span className="text-xs font-semibold text-green-700">{cartCount} in Cart</span>
+                                </Link>
+                                <Link 
+                                    href="/wishlist" 
+                                    onClick={closeMobileMenu}
+                                    className="flex items-center gap-2 p-2 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
+                                >
+                                    <Heart className="w-4 h-4 text-red-600" />
+                                    <span className="text-xs font-semibold text-red-700">{wishlistCount} Saved</span>
+                                </Link>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="space-y-2">
+                            <Link
+                                href="/login"
+                                onClick={closeMobileMenu}
+                                className="block w-full px-4 py-3 bg-green-500 text-white text-center font-bold rounded-xl hover:bg-green-600 transition-colors"
+                            >
+                                Sign In
+                            </Link>
+                            <Link
+                                href="/register"
+                                onClick={closeMobileMenu}
+                                className="block w-full px-4 py-3 border-2 border-green-500 text-green-600 text-center font-bold rounded-xl hover:bg-green-50 transition-colors"
+                            >
+                                Sign Up
+                            </Link>
+                        </div>
+                    )}
+                </div>
+
+                {/* Navigation Links */}
+                <div className="py-4">
+                    <p className="px-6 text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Menu</p>
+                    {navLinks.map(link => {
+                        const Icon = link.icon;
+                        const isActive = pathname === link.href;
+                        
+                        if (link.hasDropdown) {
+                            return (
+                                <div key={link.href}>
+                                    <button
+                                        onClick={() => setMobileCatExpanded(!mobileCatExpanded)}
+                                        className={`w-full flex items-center justify-between px-6 py-3 transition-colors ${
+                                            isActive ? 'bg-green-50 text-green-600' : 'text-gray-700 hover:bg-gray-50'
+                                        }`}
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <Icon className="w-5 h-5" />
+                                            <span className="font-semibold">{link.label}</span>
+                                        </div>
+                                        <ChevronRight className={`w-4 h-4 transition-transform ${mobileCatExpanded ? 'rotate-90' : ''}`} />
+                                    </button>
+                                    
+                                    {/* Subcategories */}
+                                    {mobileCatExpanded && (
+                                        <div className="bg-gray-50 py-2">
+                                            {categoryDropdownLinks.map(cat => (
+                                                <Link
+                                                    key={cat.href}
+                                                    href={cat.href}
+                                                    onClick={closeMobileMenu}
+                                                    className="block px-12 py-2 text-sm text-gray-600 hover:text-green-600 hover:bg-white transition-colors"
+                                                >
+                                                    {cat.label}
+                                                </Link>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        }
+                        
+                        return (
                             <Link
                                 key={link.href}
                                 href={link.href}
-                                onClick={() => setMobileOpen(false)}
-                                className="block px-4 py-3 rounded-xl text-sm font-semibold text-neutral-600 hover:bg-neutral-100"
+                                onClick={closeMobileMenu}
+                                className={`flex items-center gap-3 px-6 py-3 transition-colors ${
+                                    isActive ? 'bg-green-50 text-green-600' : 'text-gray-700 hover:bg-gray-50'
+                                }`}
                             >
-                                {link.label}
+                                <Icon className="w-5 h-5" />
+                                <span className="font-semibold">{link.label}</span>
                             </Link>
-                        ))}
+                        );
+                    })}
+                </div>
 
-                        {/* Mobile Auth Section */}
-                        <div className="pt-4 border-t border-gray-200">
-                            {isLoading ? (
-                                <div className="px-4 py-3">
-                                    <div className="w-full h-10 bg-gray-200 animate-pulse rounded-xl"></div>
-                                </div>
-                            ) : isAuthenticated ? (
-                                <div className="px-4 py-3">
-                                    <div className="flex items-center gap-3 mb-3">
-                                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-emerald-600 text-white font-semibold flex items-center justify-center">
-                                            {user?.name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'}
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-semibold text-gray-800">{user?.name}</p>
-                                            <p className="text-xs text-gray-500">{user?.email}</p>
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Link
-                                            href="/profile"
-                                            onClick={() => setMobileOpen(false)}
-                                            className="block px-4 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-100"
-                                        >
-                                            My Profile
-                                        </Link>
-                                        <Link
-                                            href="/orders"
-                                            onClick={() => setMobileOpen(false)}
-                                            className="block px-4 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-100"
-                                        >
-                                            My Orders
-                                        </Link>
-                                        <Link
-                                            href="/wishlist"
-                                            onClick={() => setMobileOpen(false)}
-                                            className="block px-4 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-100 flex items-center justify-between"
-                                        >
-                                            My Wishlist
-                                            {wishlistCount > 0 && (
-                                                <span className="px-2 py-1 bg-red-100 text-red-600 text-xs font-bold rounded-full">
-                                                    {wishlistCount}
-                                                </span>
-                                            )}
-                                        </Link>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="space-y-2">
-                                    <Link
-                                        href="/login"
-                                        onClick={() => setMobileOpen(false)}
-                                        className="block px-4 py-3 rounded-xl text-center bg-primary-500 text-white text-sm font-bold hover:bg-primary-600 transition"
-                                    >
-                                        Sign In
-                                    </Link>
-                                    <Link
-                                        href="/register"
-                                        onClick={() => setMobileOpen(false)}
-                                        className="block px-4 py-3 rounded-xl text-center border-2 border-primary-500 text-primary-600 text-sm font-bold hover:bg-primary-50 transition"
-                                    >
-                                        Sign Up
-                                    </Link>
-                                </div>
-                            )}
-                        </div>
+                {/* Account Links (if authenticated) */}
+                {isAuthenticated && (
+                    <div className="py-4 border-t border-gray-200">
+                        <p className="px-6 text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">My Account</p>
+                        <Link
+                            href="/profile"
+                            onClick={closeMobileMenu}
+                            className="flex items-center gap-3 px-6 py-3 text-gray-700 hover:bg-gray-50 transition-colors"
+                        >
+                            <User className="w-5 h-5" />
+                            <span className="font-semibold">Profile</span>
+                        </Link>
+                        <Link
+                            href="/orders"
+                            onClick={closeMobileMenu}
+                            className="flex items-center gap-3 px-6 py-3 text-gray-700 hover:bg-gray-50 transition-colors"
+                        >
+                            <Package className="w-5 h-5" />
+                            <span className="font-semibold">My Orders</span>
+                        </Link>
+                        <Link
+                            href="/profile/settings"
+                            onClick={closeMobileMenu}
+                            className="flex items-center gap-3 px-6 py-3 text-gray-700 hover:bg-gray-50 transition-colors"
+                        >
+                            <Settings className="w-5 h-5" />
+                            <span className="font-semibold">Settings</span>
+                        </Link>
                     </div>
                 )}
-            </nav>
+
+                {/* Logout Button */}
+                {isAuthenticated && (
+                    <div className="px-6 py-4 border-t border-gray-200">
+                        <button
+                            onClick={handleLogout}
+                            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-50 text-red-600 font-semibold rounded-xl hover:bg-red-100 transition-colors"
+                        >
+                            <LogOut className="w-5 h-5" />
+                            Logout
+                        </button>
+                    </div>
+                )}
+
+                {/* Footer Info */}
+                <div className="px-6 py-6 border-t border-gray-200 bg-gray-50">
+                    <p className="text-xs text-gray-500 mb-3">Need help?</p>
+                    <div className="space-y-2">
+                        <a href="tel:+18001234567" className="flex items-center gap-2 text-sm text-gray-600 hover:text-green-600 transition-colors">
+                            <Phone className="w-4 h-4" />
+                            +1 (800) 123-4567
+                        </a>
+                        <a href="mailto:support@freshcart.com" className="flex items-center gap-2 text-sm text-gray-600 hover:text-green-600 transition-colors">
+                            <Mail className="w-4 h-4" />
+                            support@freshcart.com
+                        </a>
+                    </div>
+                </div>
+            </div>
         </>
     );
 }
