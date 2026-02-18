@@ -7,6 +7,7 @@ import { useAuth } from "@/app/context/AuthContext";
 import { useCart } from "@/app/context/CartContext";
 import { useWishlist } from "@/app/context/WishlistContext";
 import UserDropdown from '@/app/components/userDropDownMenu';
+import SearchBar from '@/app/components/SearchBar'
 import {
     Phone,
     Mail,
@@ -134,16 +135,7 @@ export default function Navbar() {
                     </Link>
 
                     {/* Search */}
-                    <div className="hidden lg:flex flex-1 max-w-xl relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
-                        <input
-                            placeholder="Search products..."
-                            className="w-full pl-10 pr-12 py-2.5 rounded-xl border border-neutral-200 bg-neutral-50 focus:bg-white focus:border-primary-500 outline-none transition"
-                        />
-                        <button className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg bg-primary-500 text-white flex items-center justify-center">
-                            <Search className="w-4 h-4" />
-                        </button>
-                    </div>
+                   <SearchBar/>
 
                     {/* Desktop Links */}
                     <div className="hidden md:flex items-center gap-1 flex-row">
